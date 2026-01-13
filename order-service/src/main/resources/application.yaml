@@ -1,0 +1,11 @@
+ktor:
+    deployment:
+        port: 8082
+    application:
+        modules:
+            - com.soramitsukh.pos.ApplicationKt.module
+database:
+    url: jdbc:postgresql://order-db:5432/order_db
+    driver: org.postgresql.Driver
+    user: order
+    password: order

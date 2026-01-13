@@ -1,0 +1,11 @@
+ktor:
+    deployment:
+        port: 8081
+    application:
+        modules:
+            - com.soramitsukh.pos.ApplicationKt.module
+database:
+    url: jdbc:postgresql://product-db:5432/product_db
+    driver: org.postgresql.Driver
+    user: product
+    password: product

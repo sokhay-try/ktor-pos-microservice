@@ -1,0 +1,88 @@
+version: "3.9"
+
+services:
+
+  # ----------------------
+  # PRODUCT DATABASE
+  # ----------------------
+  product-db:
+    image: postgres:15
+    container_name: product-db
+    environment:
+      POSTGRES_DB: product_db
+      POSTGRES_USER: product
+      POSTGRES_PASSWORD: product
+    volumes:
+      - product_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U product -d product_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ----------------------
+  # ORDER DATABASE
+  # ----------------------
+  order-db:
+    image: postgres:15
+    container_name: order-db
+    environment:
+      POSTGRES_DB: order_db
+      POSTGRES_USER: order
+      POSTGRES_PASSWORD: order
+    volumes:
+      - order_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U order -d order_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ----------------------
+  # PRODUCT SERVICE
+  # ----------------------
+  product-service:
+    build: ./product-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      product-db:
+        condition: service_healthy
+
+  # ----------------------
+  # ORDER SERVICE
+  # ----------------------
+  order-service:
+    build: ./order-service
+    depends_on:
+      order-db:
+        condition: service_healthy
+      product-service:
+        condition: service_started
+
+  # ----------------------
+  # PGADMIN
+  # ----------------------
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pos-pgadmin
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    depends_on:
+      - product-db
+      - order-db
+
+  gateway-service:
+    build: ./gateway-service
+    ports:
+      - "8080:8080"
+    depends_on:
+      - product-service
+      - order-service
+
+volumes:
+  product_pgdata:
+  order_pgdata:
