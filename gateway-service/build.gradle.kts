@@ -12,6 +12,11 @@ application {
 }
 
 dependencies {
+    // JWT
+    implementation("io.ktor:ktor-server-auth")
+    implementation("io.ktor:ktor-server-auth-jwt")
+    implementation("com.auth0:java-jwt:4.4.0")
+
     // Exposed
     implementation("org.jetbrains.exposed:exposed-core:0.50.1")
     implementation("org.jetbrains.exposed:exposed-dao:0.50.1")

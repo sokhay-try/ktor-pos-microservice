@@ -1,6 +1,23 @@
 services:
 
   # ----------------------
+  # AUTH DATABASE
+  # ----------------------
+  auth-db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: auth_db
+      POSTGRES_USER: auth
+      POSTGRES_PASSWORD: auth
+    volumes:
+      - auth_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U auth -d auth_db" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ----------------------
   # PRODUCT DATABASE
   # ----------------------
   product-db:
@@ -35,6 +52,21 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+  # ----------------------
+  # AUTH SERVICE
+  # ----------------------
+  auth-service:
+    build: ./auth-service
+    ports:
+      - "8083:8083"
+    depends_on:
+      auth-db:
+        condition: service_healthy
+    environment:
+      DB_URL: "jdbc:postgresql://auth-db:5432/auth_db"
+      DB_USER: "auth"
+      DB_PASSWORD: "auth"
 
   # ----------------------
   # PRODUCT SERVICE
@@ -80,7 +112,9 @@ services:
     depends_on:
       - product-service
       - order-service
+      - auth-service
 
 volumes:
   product_pgdata:
   order_pgdata:
+  auth_pgdata:
