@@ -1,0 +1,11 @@
+ktor:
+    deployment:
+        port: 8083
+    application:
+        modules:
+            - com.soramitsukh.pos.ApplicationKt.module
+database:
+    url: jdbc:postgresql://auth-db:5432/auth_db
+    driver: org.postgresql.Driver
+    user: auth
+    password: auth
